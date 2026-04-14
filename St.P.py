@@ -63,27 +63,24 @@ if not data.empty:
 
         st.write(data.tail(5))
 
-    # --- 4. EDA SECTION ---
+        # --- 4. EDA SECTION ---
     st.divider()
     st.subheader("🔍 Exploratory Data Analysis")
     eda_col1, eda_col2 = st.columns(2)
     
-    # Calculate returns and FORCE them into a flat 1D array
-    # .iloc[:, 0] ensures we only grab the first column if it's a dataframe
-    data_returns = data['Close'].pct_change().dropna()
-    if isinstance(data_returns, pd.DataFrame):
-        data_returns = data_returns.iloc[:, 0]
-    
-    # Final safety check to make it a flat array for Plotly
-    flat_returns = data_returns.values.flatten()
+    # .ravel() is the most powerful way to fix the "Data must be 1-dimensional" error
+    data_returns = data['Close'].pct_change().dropna().values.ravel()
 
     with eda_col1:
-        fig_hist = px.histogram(x=flat_returns, title="Return Distribution", labels={'x': 'Daily Returns'})
+        # Pass the raveled data directly to x
+        fig_hist = px.histogram(x=data_returns, title="Return Distribution", labels={'x': 'Daily Returns'})
         st.plotly_chart(fig_hist, width='stretch')
     
     with eda_col2:
-        fig_box = px.box(y=flat_returns, title="Volatility Range", labels={'y': 'Daily Returns'})
+        # Pass the raveled data directly to y
+        fig_box = px.box(y=data_returns, title="Volatility Range", labels={'y': 'Daily Returns'})
         st.plotly_chart(fig_box, width='stretch')
+
 
 
 
