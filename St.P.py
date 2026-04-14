@@ -63,21 +63,19 @@ if not data.empty:
 
         st.write(data.tail(5))
 
-       # --- 4. EDA SECTION ---
+          # --- 4. EDA SECTION ---
     st.divider()
     st.subheader("🔍 Exploratory Data Analysis")
     eda_col1, eda_col2 = st.columns(2)
     
-    # Calculate returns again to be safe
-    data_returns = data['Close'].pct_change().dropna()
+    # .squeeze() turns the 2D table into a 1D list that Plotly can read
+    data_returns = data['Close'].pct_change().dropna().squeeze()
 
     with eda_col1:
-        # Pass the data directly to 'x' instead of using a column name
         fig_hist = px.histogram(x=data_returns, title="Return Distribution", labels={'x': 'Daily Returns'})
         st.plotly_chart(fig_hist, width='stretch')
     
     with eda_col2:
-        # Pass the data directly to 'y'
         fig_box = px.box(y=data_returns, title="Volatility Outliers", labels={'y': 'Daily Returns'})
         st.plotly_chart(fig_box, width='stretch')
 
