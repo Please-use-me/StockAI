@@ -63,17 +63,24 @@ if not data.empty:
 
         st.write(data.tail(5))
 
-    # --- 4. EDA SECTION ---
+       # --- 4. EDA SECTION ---
     st.divider()
     st.subheader("🔍 Exploratory Data Analysis")
     eda_col1, eda_col2 = st.columns(2)
     
+    # Calculate returns again to be safe
+    data_returns = data['Close'].pct_change().dropna()
+
     with eda_col1:
-        data['Returns'] = data['Close'].pct_change()
-        st.plotly_chart(px.histogram(data, x="Returns", title="Return Distribution"), use_container_width=True)
+        # Pass the data directly to 'x' instead of using a column name
+        fig_hist = px.histogram(x=data_returns, title="Return Distribution", labels={'x': 'Daily Returns'})
+        st.plotly_chart(fig_hist, width='stretch')
     
     with eda_col2:
-        st.plotly_chart(px.box(data, y="Returns", title="Volatility Outliers"), use_container_width=True)
+        # Pass the data directly to 'y'
+        fig_box = px.box(y=data_returns, title="Volatility Outliers", labels={'y': 'Daily Returns'})
+        st.plotly_chart(fig_box, width='stretch')
+
 
     # --- 5. ML PREDICTION ---
     st.divider()
