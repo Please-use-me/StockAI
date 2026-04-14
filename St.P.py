@@ -63,23 +63,28 @@ if not data.empty:
 
         st.write(data.tail(5))
 
-        # --- 4. EDA SECTION ---
+            # --- 4. EDA SECTION ---
     st.divider()
     st.subheader("🔍 Exploratory Data Analysis")
     eda_col1, eda_col2 = st.columns(2)
     
-    # .ravel() is the most powerful way to fix the "Data must be 1-dimensional" error
-    data_returns = data['Close'].pct_change().dropna().values.ravel()
+    # Force the data to be 1-dimensional to fix the (339, 1) error
+    raw_returns = data['Close'].pct_change().dropna()
+    
+    # This step specifically handles the (339, 1) shape error
+    if len(raw_returns.shape) > 1:
+        clean_returns = raw_returns.iloc[:, 0].values.flatten()
+    else:
+        clean_returns = raw_returns.values.flatten()
 
     with eda_col1:
-        # Pass the raveled data directly to x
-        fig_hist = px.histogram(x=data_returns, title="Return Distribution", labels={'x': 'Daily Returns'})
+        fig_hist = px.histogram(x=clean_returns, title="Return Distribution", labels={'x': 'Daily Returns'})
         st.plotly_chart(fig_hist, width='stretch')
     
     with eda_col2:
-        # Pass the raveled data directly to y
-        fig_box = px.box(y=data_returns, title="Volatility Range", labels={'y': 'Daily Returns'})
+        fig_box = px.box(y=clean_returns, title="Volatility Range", labels={'y': 'Daily Returns'})
         st.plotly_chart(fig_box, width='stretch')
+
 
 
 
