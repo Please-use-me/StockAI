@@ -55,7 +55,11 @@ if not data.empty:
 
         avg_return = float((data['Close'].pct_change().mean() * 100).item())
 
-        avg_return = float(data['Returns'].mean().item() * 100)
+                
+        daily_ret = data['Close'].pct_change().dropna()
+        avg_return = float(daily_ret.mean().item() * 100)
+        st.metric("Avg Daily Return", f"{avg_return:.2f}%")
+
 
         st.write(data.tail(5))
 
