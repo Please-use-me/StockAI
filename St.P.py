@@ -7,7 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 from datetime import datetime, timedelta
 
 # --- 1. SETUP & DATA FETCHING ---
-st.set_page_config(page_title="All-in-One Stock App", layout="wide")
+st.set_page_config(page_title="Stox Analyzer", layout="wide")
 st.title("📈 Pro Stock Analyzer & ML Predictor")
 
 ticker = st.sidebar.text_input("Enter Ticker Symbol", "AAPL").upper()
@@ -18,16 +18,20 @@ def load_data(symbol, days):
     end = datetime.now()
     start = end - timedelta(days=days)
     df = yf.download(symbol, start=start, end=end)
+    # Critical Fix: Flatten multi-index columns if they exist
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = df.columns.get_level_values(0)
     return df
 
 data = load_data(ticker, days_back)
 
 if not data.empty:
-    # --- 2. TECHNICAL INDICATORS & SIGNALS ---
-    data['MA20'] = data['Close'].rolling(20).mean()
-    data['MA50'] = data['Close'].rolling(50).mean()
+    # --- 2. TECHNICAL INDICATORS ---
+    # .squeeze() ensures we are working with 1D series
+    close_prices = data['Close'].squeeze()
+    data['MA20'] = close_prices.rolling(20).mean()
+    data['MA50'] = close_prices.rolling(50).mean()
     
-    data['Signal'] = 0.0
     data['Signal'] = (data['MA20'] > data['MA50']).astype(float)
     data['Position'] = data['Signal'].diff()
 
@@ -37,67 +41,64 @@ if not data.empty:
     with col1:
         st.subheader("Price & Crossover Signals")
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=data.index, y=data['Close'].squeeze(), name="Close", line=dict(color='gray', width=1)))
-        fig.add_trace(go.Scatter(x=data.index, y=data['MA20'].squeeze(), name="20-Day MA", line=dict(color='blue')))
-        fig.add_trace(go.Scatter(x=data.index, y=data['MA50'].squeeze(), name="50-Day MA", line=dict(color='orange')))
+        fig.add_trace(go.Scatter(x=data.index, y=close_prices, name="Close", line=dict(color='gray', width=1)))
+        fig.add_trace(go.Scatter(x=data.index, y=data['MA20'], name="20-Day MA", line=dict(color='blue')))
+        fig.add_trace(go.Scatter(x=data.index, y=data['MA50'], name="50-Day MA", line=dict(color='orange')))
         
         # Plot Buy/Sell signals
-        fig.add_trace(go.Scatter(x=data[data['Position'] == 1].index, y=data['MA20'][data['Position'] == 1], 
-                                 mode='markers', marker=dict(symbol='triangle-up', size=12, color='green'), name='Buy'))
-        fig.add_trace(go.Scatter(x=data[data['Position'] == -1].index, y=data['MA20'][data['Position'] == -1], 
-                                 mode='markers', marker=dict(symbol='triangle-down', size=12, color='red'), name='Sell'))
-        st.plotly_chart(fig, use_container_width=True)
+        buy_sig = data[data['Position'] == 1]
+        sell_sig = data[data['Position'] == -1]
+        fig.add_trace(go.Scatter(x=buy_sig.index, y=buy_sig['MA20'], mode='markers', 
+                                 marker=dict(symbol='triangle-up', size=12, color='green'), name='Buy'))
+        fig.add_trace(go.Scatter(x=sell_sig.index, y=sell_sig['MA20'], mode='markers', 
+                                 marker=dict(symbol='triangle-down', size=12, color='red'), name='Sell'))
+        st.plotly_chart(fig, width='stretch')
 
     with col2:
         st.subheader("📊 Statistics")
-        latest_price = float(data['Close'].iloc[-1].item())
-        st.metric("Latest Price", f"${latest_price:.2f}")
+        # .item() extracts the pure number for the metric
+        curr_price = float(close_prices.iloc[-1])
+        st.metric("Latest Price", f"${curr_price:.2f}")
 
-        avg_return = float((data['Close'].pct_change().mean() * 100).item())
+        returns = close_prices.pct_change().dropna()
+        avg_ret = float(returns.mean() * 100)
+        st.metric("Avg Daily Return", f"{avg_ret:.2f}%")
+        st.write("Recent Data History", data.tail(5))
 
-                
-        daily_ret = data['Close'].pct_change().dropna()
-        avg_return = float(daily_ret.mean().item() * 100)
-        st.metric("Avg Daily Return", f"{avg_return:.2f}%")
-
-
-        st.write(data.tail(5))
-
-             # --- 4. EDA SECTION (Simplified to fix errors) ---
+    # --- 4. EDA SECTION (Safe Charts) ---
     st.divider()
-    st.subheader("🔍 Market Overview")
+    st.subheader("🔍 Market Insights")
+    e1, e2 = st.columns(2)
     
-    # We display a simple table instead of the broken charts
-    st.write("Recent Daily Returns (%)")
-    display_returns = (data['Close'].pct_change() * 100).dropna().tail(10)
-    st.dataframe(display_returns)
+    with e1:
+        # Pass values directly to fix 1D-dimensional error
+        fig_hist = px.histogram(x=returns.values.flatten(), title="Return Distribution", labels={'x': 'Daily Return'})
+        st.plotly_chart(fig_hist, width='stretch')
+    with e2:
+        fig_box = px.box(y=returns.values.flatten(), title="Volatility Range", labels={'y': 'Daily Return'})
+        st.plotly_chart(fig_box, width='stretch')
 
     # --- 5. ML PREDICTION ---
     st.divider()
     st.subheader("🤖 AI Price Direction Prediction")
     
-    # Clean data for ML
     ml_df = data.copy().dropna()
-    # Ensure we have 1D arrays for the target
-    ml_df['Target'] = (ml_df['Close'].shift(-1) > ml_df['Close']).astype(int)
+    ml_df['Target'] = (ml_df['Close'].squeeze().shift(-1) > ml_df['Close'].squeeze()).astype(int)
     
-    # Force features to be a clean 2D array and target to be 1D
+    # Force 2D features and 1D target
     X = ml_df[['MA20', 'MA50']].iloc[:-1].values
     y = ml_df['Target'].iloc[:-1].values.ravel()
     
-    if len(X) > 0:
-        model = RandomForestClassifier(n_estimators=100, random_state=42)
-        model.fit(X, y)
-        
-        # Predict for the next day
-        last_features = ml_df[['MA20', 'MA50']].tail(1).values
-        pred = model.predict(last_features)[0]
+    if len(X) > 30:
+        model = RandomForestClassifier(n_estimators=100, random_state=42).fit(X, y)
+        last_feat = ml_df[['MA20', 'MA50']].tail(1).values
+        pred = model.predict(last_feat)[0]
         
         if pred == 1:
-            st.success("Model Predicts: **UP** (Bullish Movement)")
+            st.success(f"Model Predicts: **UP** tomorrow for {ticker} (Bullish)")
         else:
-            st.error("Model Predicts: **DOWN** (Bearish Movement)")
+            st.error(f"Model Predicts: **DOWN** tomorrow for {ticker} (Bearish)")
     else:
-        st.info("Not enough data for AI prediction yet.")
+        st.info("Insufficient data for a reliable AI prediction.")
 else:
-    st.warning("Please enter a valid stock ticker symbol.")
+    st.error("Invalid Ticker. Please check the symbol and try again.")
