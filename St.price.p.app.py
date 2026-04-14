@@ -1,433 +1,92 @@
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": 2,
-   "id": "986c167a-290a-4dfe-87d2-c205956c8603",
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "Collecting yfinance\n",
-      "  Downloading yfinance-1.2.2-py2.py3-none-any.whl.metadata (6.1 kB)\n",
-      "Requirement already satisfied: streamlit in /opt/anaconda3/lib/python3.13/site-packages (1.51.0)\n",
-      "Requirement already satisfied: pandas in /opt/anaconda3/lib/python3.13/site-packages (2.3.3)\n",
-      "Requirement already satisfied: plotly in /opt/anaconda3/lib/python3.13/site-packages (6.3.0)\n",
-      "Requirement already satisfied: scikit-learn in /opt/anaconda3/lib/python3.13/site-packages (1.7.2)\n",
-      "Requirement already satisfied: numpy>=1.16.5 in /opt/anaconda3/lib/python3.13/site-packages (from yfinance) (2.3.5)\n",
-      "Requirement already satisfied: requests>=2.31 in /opt/anaconda3/lib/python3.13/site-packages (from yfinance) (2.32.5)\n",
-      "Collecting multitasking>=0.0.7 (from yfinance)\n",
-      "  Downloading multitasking-0.0.12.tar.gz (19 kB)\n",
-      "  Installing build dependencies ... \u001b[?25ldone\n",
-      "\u001b[?25h  Getting requirements to build wheel ... \u001b[?25ldone\n",
-      "\u001b[?25h  Preparing metadata (pyproject.toml) ... \u001b[?25ldone\n",
-      "\u001b[?25hRequirement already satisfied: platformdirs>=2.0.0 in /opt/anaconda3/lib/python3.13/site-packages (from yfinance) (4.5.0)\n",
-      "Requirement already satisfied: pytz>=2022.5 in /opt/anaconda3/lib/python3.13/site-packages (from yfinance) (2025.2)\n",
-      "Requirement already satisfied: frozendict>=2.3.4 in /opt/anaconda3/lib/python3.13/site-packages (from yfinance) (2.4.6)\n",
-      "Collecting peewee>=3.16.2 (from yfinance)\n",
-      "  Downloading peewee-4.0.4-py3-none-any.whl.metadata (8.6 kB)\n",
-      "Requirement already satisfied: beautifulsoup4>=4.11.1 in /opt/anaconda3/lib/python3.13/site-packages (from yfinance) (4.14.3)\n",
-      "Collecting curl_cffi>=0.15 (from yfinance)\n",
-      "  Downloading curl_cffi-0.15.0-cp310-abi3-macosx_11_0_arm64.whl.metadata (18 kB)\n",
-      "Requirement already satisfied: protobuf>=3.19.0 in /opt/anaconda3/lib/python3.13/site-packages (from yfinance) (5.29.3)\n",
-      "Collecting websockets>=13.0 (from yfinance)\n",
-      "  Downloading websockets-16.0-cp313-cp313-macosx_11_0_arm64.whl.metadata (6.8 kB)\n",
-      "Requirement already satisfied: altair!=5.4.0,!=5.4.1,<6,>=4.0 in /opt/anaconda3/lib/python3.13/site-packages (from streamlit) (5.5.0)\n",
-      "Requirement already satisfied: blinker<2,>=1.5.0 in /opt/anaconda3/lib/python3.13/site-packages (from streamlit) (1.9.0)\n",
-      "Requirement already satisfied: cachetools<7,>=4.0 in /opt/anaconda3/lib/python3.13/site-packages (from streamlit) (5.5.1)\n",
-      "Requirement already satisfied: click<9,>=7.0 in /opt/anaconda3/lib/python3.13/site-packages (from streamlit) (8.2.1)\n",
-      "Requirement already satisfied: packaging<26,>=20 in /opt/anaconda3/lib/python3.13/site-packages (from streamlit) (25.0)\n",
-      "Requirement already satisfied: pillow<13,>=7.1.0 in /opt/anaconda3/lib/python3.13/site-packages (from streamlit) (12.0.0)\n",
-      "Requirement already satisfied: pyarrow<22,>=7.0 in /opt/anaconda3/lib/python3.13/site-packages (from streamlit) (21.0.0)\n",
-      "Requirement already satisfied: tenacity<10,>=8.1.0 in /opt/anaconda3/lib/python3.13/site-packages (from streamlit) (9.1.2)\n",
-      "Requirement already satisfied: toml<2,>=0.10.1 in /opt/anaconda3/lib/python3.13/site-packages (from streamlit) (0.10.2)\n",
-      "Requirement already satisfied: typing-extensions<5,>=4.4.0 in /opt/anaconda3/lib/python3.13/site-packages (from streamlit) (4.15.0)\n",
-      "Requirement already satisfied: gitpython!=3.1.19,<4,>=3.0.7 in /opt/anaconda3/lib/python3.13/site-packages (from streamlit) (3.1.45)\n",
-      "Requirement already satisfied: tornado!=6.5.0,<7,>=6.0.3 in /opt/anaconda3/lib/python3.13/site-packages (from streamlit) (6.5.1)\n",
-      "Requirement already satisfied: python-dateutil>=2.8.2 in /opt/anaconda3/lib/python3.13/site-packages (from pandas) (2.9.0.post0)\n",
-      "Requirement already satisfied: tzdata>=2022.7 in /opt/anaconda3/lib/python3.13/site-packages (from pandas) (2025.2)\n",
-      "Requirement already satisfied: jinja2 in /opt/anaconda3/lib/python3.13/site-packages (from altair!=5.4.0,!=5.4.1,<6,>=4.0->streamlit) (3.1.6)\n",
-      "Requirement already satisfied: jsonschema>=3.0 in /opt/anaconda3/lib/python3.13/site-packages (from altair!=5.4.0,!=5.4.1,<6,>=4.0->streamlit) (4.25.0)\n",
-      "Requirement already satisfied: narwhals>=1.14.2 in /opt/anaconda3/lib/python3.13/site-packages (from altair!=5.4.0,!=5.4.1,<6,>=4.0->streamlit) (2.7.0)\n",
-      "Requirement already satisfied: gitdb<5,>=4.0.1 in /opt/anaconda3/lib/python3.13/site-packages (from gitpython!=3.1.19,<4,>=3.0.7->streamlit) (4.0.12)\n",
-      "Requirement already satisfied: smmap<6,>=3.0.1 in /opt/anaconda3/lib/python3.13/site-packages (from gitdb<5,>=4.0.1->gitpython!=3.1.19,<4,>=3.0.7->streamlit) (4.0.0)\n",
-      "Requirement already satisfied: charset_normalizer<4,>=2 in /opt/anaconda3/lib/python3.13/site-packages (from requests>=2.31->yfinance) (3.4.4)\n",
-      "Requirement already satisfied: idna<4,>=2.5 in /opt/anaconda3/lib/python3.13/site-packages (from requests>=2.31->yfinance) (3.11)\n",
-      "Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/anaconda3/lib/python3.13/site-packages (from requests>=2.31->yfinance) (2.5.0)\n",
-      "Requirement already satisfied: certifi>=2017.4.17 in /opt/anaconda3/lib/python3.13/site-packages (from requests>=2.31->yfinance) (2026.1.4)\n",
-      "Requirement already satisfied: scipy>=1.8.0 in /opt/anaconda3/lib/python3.13/site-packages (from scikit-learn) (1.16.3)\n",
-      "Requirement already satisfied: joblib>=1.2.0 in /opt/anaconda3/lib/python3.13/site-packages (from scikit-learn) (1.5.3)\n",
-      "Requirement already satisfied: threadpoolctl>=3.1.0 in /opt/anaconda3/lib/python3.13/site-packages (from scikit-learn) (3.5.0)\n",
-      "Requirement already satisfied: soupsieve>=1.6.1 in /opt/anaconda3/lib/python3.13/site-packages (from beautifulsoup4>=4.11.1->yfinance) (2.5)\n",
-      "Requirement already satisfied: cffi>=2.0.0 in /opt/anaconda3/lib/python3.13/site-packages (from curl_cffi>=0.15->yfinance) (2.0.0)\n",
-      "Requirement already satisfied: rich in /opt/anaconda3/lib/python3.13/site-packages (from curl_cffi>=0.15->yfinance) (14.2.0)\n",
-      "Requirement already satisfied: pycparser in /opt/anaconda3/lib/python3.13/site-packages (from cffi>=2.0.0->curl_cffi>=0.15->yfinance) (2.23)\n",
-      "Requirement already satisfied: attrs>=22.2.0 in /opt/anaconda3/lib/python3.13/site-packages (from jsonschema>=3.0->altair!=5.4.0,!=5.4.1,<6,>=4.0->streamlit) (25.4.0)\n",
-      "Requirement already satisfied: jsonschema-specifications>=2023.03.6 in /opt/anaconda3/lib/python3.13/site-packages (from jsonschema>=3.0->altair!=5.4.0,!=5.4.1,<6,>=4.0->streamlit) (2025.9.1)\n",
-      "Requirement already satisfied: referencing>=0.28.4 in /opt/anaconda3/lib/python3.13/site-packages (from jsonschema>=3.0->altair!=5.4.0,!=5.4.1,<6,>=4.0->streamlit) (0.37.0)\n",
-      "Requirement already satisfied: rpds-py>=0.7.1 in /opt/anaconda3/lib/python3.13/site-packages (from jsonschema>=3.0->altair!=5.4.0,!=5.4.1,<6,>=4.0->streamlit) (0.28.0)\n",
-      "Requirement already satisfied: six>=1.5 in /opt/anaconda3/lib/python3.13/site-packages (from python-dateutil>=2.8.2->pandas) (1.17.0)\n",
-      "Requirement already satisfied: MarkupSafe>=2.0 in /opt/anaconda3/lib/python3.13/site-packages (from jinja2->altair!=5.4.0,!=5.4.1,<6,>=4.0->streamlit) (3.0.2)\n",
-      "Requirement already satisfied: markdown-it-py>=2.2.0 in /opt/anaconda3/lib/python3.13/site-packages (from rich->curl_cffi>=0.15->yfinance) (2.2.0)\n",
-      "Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /opt/anaconda3/lib/python3.13/site-packages (from rich->curl_cffi>=0.15->yfinance) (2.19.2)\n",
-      "Requirement already satisfied: mdurl~=0.1 in /opt/anaconda3/lib/python3.13/site-packages (from markdown-it-py>=2.2.0->rich->curl_cffi>=0.15->yfinance) (0.1.2)\n",
-      "Downloading yfinance-1.2.2-py2.py3-none-any.whl (130 kB)\n",
-      "Downloading curl_cffi-0.15.0-cp310-abi3-macosx_11_0_arm64.whl (2.6 MB)\n",
-      "\u001b[2K   \u001b[38;2;114;156;31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m2.6/2.6 MB\u001b[0m \u001b[31m179.9 kB/s\u001b[0m  \u001b[33m0:00:14\u001b[0m\u001b[31m182.7 kB/s\u001b[0m eta \u001b[36m0:00:02\u001b[0m\n",
-      "\u001b[?25hDownloading peewee-4.0.4-py3-none-any.whl (144 kB)\n",
-      "Downloading websockets-16.0-cp313-cp313-macosx_11_0_arm64.whl (175 kB)\n",
-      "Building wheels for collected packages: multitasking\n",
-      "  Building wheel for multitasking (pyproject.toml) ... \u001b[?25ldone\n",
-      "\u001b[?25h  Created wheel for multitasking: filename=multitasking-0.0.12-py3-none-any.whl size=15635 sha256=c0fabc2bf2f5348756dfc55a2a2bad84338017a77f94acb0f596059f21542260\n",
-      "  Stored in directory: /Users/suyashbiranje/Library/Caches/pip/wheels/1e/df/0f/e2bbb22d689b30c681feb5410ab64a2523437b34c8ecfc6476\n",
-      "Successfully built multitasking\n",
-      "Installing collected packages: peewee, multitasking, websockets, curl_cffi, yfinance\n",
-      "\u001b[2K   \u001b[38;2;114;156;31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m5/5\u001b[0m [yfinance]━━\u001b[0m \u001b[32m4/5\u001b[0m [yfinance]s]\n",
-      "\u001b[1A\u001b[2KSuccessfully installed curl_cffi-0.15.0 multitasking-0.0.12 peewee-4.0.4 websockets-16.0 yfinance-1.2.2\n"
-     ]
-    }
-   ],
-   "source": [
-    "!pip install yfinance streamlit pandas plotly scikit-learn"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 6,
-   "id": "ed1b620e-2cda-4dc2-86c5-339f09cf3749",
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "2026-04-14 17:12:56.267 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.269 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.269 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.269 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.270 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.270 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.270 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.270 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.276 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.296 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.307 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.330 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.333 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.334 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.335 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.335 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.335 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.336 No runtime found, using MemoryCacheStorageManager\n",
-      "2026-04-14 17:12:56.368 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.368 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.368 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.368 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.368 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.369 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.375 Please replace `use_container_width` with `width`.\n",
-      "\n",
-      "`use_container_width` will be removed after 2025-12-31.\n",
-      "\n",
-      "For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.\n",
-      "2026-04-14 17:12:56.377 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.378 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.378 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.378 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.378 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.378 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.379 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.379 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "/var/folders/kb/0y_tdz814c12txkqplnls8n00000gn/T/ipykernel_27182/199612242.py:54: FutureWarning:\n",
-      "\n",
-      "Calling float on a single element Series is deprecated and will raise a TypeError in the future. Use float(ser.iloc[0]) instead\n",
-      "\n",
-      "2026-04-14 17:12:56.381 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.381 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.381 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "/var/folders/kb/0y_tdz814c12txkqplnls8n00000gn/T/ipykernel_27182/199612242.py:57: FutureWarning:\n",
-      "\n",
-      "Calling float on a single element Series is deprecated and will raise a TypeError in the future. Use float(ser.iloc[0]) instead\n",
-      "\n",
-      "2026-04-14 17:12:56.383 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.383 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.384 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.411 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.413 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.413 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.413 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.413 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
-      "2026-04-14 17:12:56.413 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n"
-     ]
-    },
-    {
-     "ename": "ValueError",
-     "evalue": "Value of 'x' is not the name of a column in 'data_frame'. Expected one of [('Close', 'AAPL'), ('High', 'AAPL'), ('Low', 'AAPL'), ('Open', 'AAPL'), ('Volume', 'AAPL'), ('MA20', ''), ('MA50', ''), ('Signal', ''), ('Position', ''), ('Returns', '')] but received: Returns",
-     "output_type": "error",
-     "traceback": [
-      "\u001b[31m---------------------------------------------------------------------------\u001b[39m",
-      "\u001b[31mValueError\u001b[39m                                Traceback (most recent call last)",
-      "\u001b[36mCell\u001b[39m\u001b[36m \u001b[39m\u001b[32mIn[6]\u001b[39m\u001b[32m, line 68\u001b[39m\n\u001b[32m     66\u001b[39m \u001b[38;5;28;01mwith\u001b[39;00m eda_col1:\n\u001b[32m     67\u001b[39m     data[\u001b[33m'\u001b[39m\u001b[33mReturns\u001b[39m\u001b[33m'\u001b[39m] = data[\u001b[33m'\u001b[39m\u001b[33mClose\u001b[39m\u001b[33m'\u001b[39m].pct_change()\n\u001b[32m---> \u001b[39m\u001b[32m68\u001b[39m     st.plotly_chart(\u001b[43mpx\u001b[49m\u001b[43m.\u001b[49m\u001b[43mhistogram\u001b[49m\u001b[43m(\u001b[49m\u001b[43mdata\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mx\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m\"\u001b[39;49m\u001b[33;43mReturns\u001b[39;49m\u001b[33;43m\"\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mtitle\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m\"\u001b[39;49m\u001b[33;43mReturn Distribution\u001b[39;49m\u001b[33;43m\"\u001b[39;49m\u001b[43m)\u001b[49m, use_container_width=\u001b[38;5;28;01mTrue\u001b[39;00m)\n\u001b[32m     70\u001b[39m \u001b[38;5;28;01mwith\u001b[39;00m eda_col2:\n\u001b[32m     71\u001b[39m     st.plotly_chart(px.box(data, y=\u001b[33m\"\u001b[39m\u001b[33mReturns\u001b[39m\u001b[33m\"\u001b[39m, title=\u001b[33m\"\u001b[39m\u001b[33mVolatility Outliers\u001b[39m\u001b[33m\"\u001b[39m), use_container_width=\u001b[38;5;28;01mTrue\u001b[39;00m)\n",
-      "\u001b[36mFile \u001b[39m\u001b[32m/opt/anaconda3/lib/python3.13/site-packages/plotly/express/_chart_types.py:490\u001b[39m, in \u001b[36mhistogram\u001b[39m\u001b[34m(data_frame, x, y, color, pattern_shape, facet_row, facet_col, facet_col_wrap, facet_row_spacing, facet_col_spacing, hover_name, hover_data, animation_frame, animation_group, category_orders, labels, color_discrete_sequence, color_discrete_map, pattern_shape_sequence, pattern_shape_map, marginal, opacity, orientation, barmode, barnorm, histnorm, log_x, log_y, range_x, range_y, histfunc, cumulative, nbins, text_auto, title, subtitle, template, width, height)\u001b[39m\n\u001b[32m    443\u001b[39m \u001b[38;5;28;01mdef\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[34mhistogram\u001b[39m(\n\u001b[32m    444\u001b[39m     data_frame=\u001b[38;5;28;01mNone\u001b[39;00m,\n\u001b[32m    445\u001b[39m     x=\u001b[38;5;28;01mNone\u001b[39;00m,\n\u001b[32m   (...)\u001b[39m\u001b[32m    482\u001b[39m     height=\u001b[38;5;28;01mNone\u001b[39;00m,\n\u001b[32m    483\u001b[39m ) -> go.Figure:\n\u001b[32m    484\u001b[39m \u001b[38;5;250m    \u001b[39m\u001b[33;03m\"\"\"\u001b[39;00m\n\u001b[32m    485\u001b[39m \u001b[33;03m    In a histogram, rows of `data_frame` are grouped together into a\u001b[39;00m\n\u001b[32m    486\u001b[39m \u001b[33;03m    rectangular mark to visualize the 1D distribution of an aggregate\u001b[39;00m\n\u001b[32m    487\u001b[39m \u001b[33;03m    function `histfunc` (e.g. the count or sum) of the value `y` (or `x` if\u001b[39;00m\n\u001b[32m    488\u001b[39m \u001b[33;03m    `orientation` is `'h'`).\u001b[39;00m\n\u001b[32m    489\u001b[39m \u001b[33;03m    \"\"\"\u001b[39;00m\n\u001b[32m--> \u001b[39m\u001b[32m490\u001b[39m     \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mmake_figure\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m    491\u001b[39m \u001b[43m        \u001b[49m\u001b[43margs\u001b[49m\u001b[43m=\u001b[49m\u001b[38;5;28;43mlocals\u001b[39;49m\u001b[43m(\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m    492\u001b[39m \u001b[43m        \u001b[49m\u001b[43mconstructor\u001b[49m\u001b[43m=\u001b[49m\u001b[43mgo\u001b[49m\u001b[43m.\u001b[49m\u001b[43mHistogram\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m    493\u001b[39m \u001b[43m        \u001b[49m\u001b[43mtrace_patch\u001b[49m\u001b[43m=\u001b[49m\u001b[38;5;28;43mdict\u001b[39;49m\u001b[43m(\u001b[49m\n\u001b[32m    494\u001b[39m \u001b[43m            \u001b[49m\u001b[43mhistnorm\u001b[49m\u001b[43m=\u001b[49m\u001b[43mhistnorm\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m    495\u001b[39m \u001b[43m            \u001b[49m\u001b[43mhistfunc\u001b[49m\u001b[43m=\u001b[49m\u001b[43mhistfunc\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m    496\u001b[39m \u001b[43m            \u001b[49m\u001b[43mcumulative\u001b[49m\u001b[43m=\u001b[49m\u001b[38;5;28;43mdict\u001b[39;49m\u001b[43m(\u001b[49m\u001b[43menabled\u001b[49m\u001b[43m=\u001b[49m\u001b[43mcumulative\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m    497\u001b[39m \u001b[43m        \u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m    498\u001b[39m \u001b[43m        \u001b[49m\u001b[43mlayout_patch\u001b[49m\u001b[43m=\u001b[49m\u001b[38;5;28;43mdict\u001b[39;49m\u001b[43m(\u001b[49m\u001b[43mbarmode\u001b[49m\u001b[43m=\u001b[49m\u001b[43mbarmode\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mbarnorm\u001b[49m\u001b[43m=\u001b[49m\u001b[43mbarnorm\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m    499\u001b[39m \u001b[43m    \u001b[49m\u001b[43m)\u001b[49m\n",
-      "\u001b[36mFile \u001b[39m\u001b[32m/opt/anaconda3/lib/python3.13/site-packages/plotly/express/_core.py:2491\u001b[39m, in \u001b[36mmake_figure\u001b[39m\u001b[34m(args, constructor, trace_patch, layout_patch)\u001b[39m\n\u001b[32m   2488\u001b[39m layout_patch = layout_patch \u001b[38;5;129;01mor\u001b[39;00m {}\n\u001b[32m   2489\u001b[39m apply_default_cascade(args)\n\u001b[32m-> \u001b[39m\u001b[32m2491\u001b[39m args = \u001b[43mbuild_dataframe\u001b[49m\u001b[43m(\u001b[49m\u001b[43margs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mconstructor\u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m   2492\u001b[39m \u001b[38;5;28;01mif\u001b[39;00m constructor \u001b[38;5;129;01min\u001b[39;00m [go.Treemap, go.Sunburst, go.Icicle] \u001b[38;5;129;01mand\u001b[39;00m args[\u001b[33m\"\u001b[39m\u001b[33mpath\u001b[39m\u001b[33m\"\u001b[39m] \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;129;01mnot\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m:\n\u001b[32m   2493\u001b[39m     args = process_dataframe_hierarchy(args)\n",
-      "\u001b[36mFile \u001b[39m\u001b[32m/opt/anaconda3/lib/python3.13/site-packages/plotly/express/_core.py:1737\u001b[39m, in \u001b[36mbuild_dataframe\u001b[39m\u001b[34m(args, constructor)\u001b[39m\n\u001b[32m   1734\u001b[39m     args[\u001b[33m\"\u001b[39m\u001b[33mcolor\u001b[39m\u001b[33m\"\u001b[39m] = \u001b[38;5;28;01mNone\u001b[39;00m\n\u001b[32m   1735\u001b[39m \u001b[38;5;66;03m# now that things have been prepped, we do the systematic rewriting of `args`\u001b[39;00m\n\u001b[32m-> \u001b[39m\u001b[32m1737\u001b[39m df_output, wide_id_vars = \u001b[43mprocess_args_into_dataframe\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m   1738\u001b[39m \u001b[43m    \u001b[49m\u001b[43margs\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1739\u001b[39m \u001b[43m    \u001b[49m\u001b[43mwide_mode\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1740\u001b[39m \u001b[43m    \u001b[49m\u001b[43mvar_name\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1741\u001b[39m \u001b[43m    \u001b[49m\u001b[43mvalue_name\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1742\u001b[39m \u001b[43m    \u001b[49m\u001b[43mis_pd_like\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1743\u001b[39m \u001b[43m    \u001b[49m\u001b[43mnative_namespace\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1744\u001b[39m \u001b[43m\u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m   1745\u001b[39m df_output: nw.DataFrame\n\u001b[32m   1746\u001b[39m \u001b[38;5;66;03m# now that `df_output` exists and `args` contains only references, we complete\u001b[39;00m\n\u001b[32m   1747\u001b[39m \u001b[38;5;66;03m# the special-case and wide-mode handling by further rewriting args and/or mutating\u001b[39;00m\n\u001b[32m   1748\u001b[39m \u001b[38;5;66;03m# df_output\u001b[39;00m\n",
-      "\u001b[36mFile \u001b[39m\u001b[32m/opt/anaconda3/lib/python3.13/site-packages/plotly/express/_core.py:1338\u001b[39m, in \u001b[36mprocess_args_into_dataframe\u001b[39m\u001b[34m(args, wide_mode, var_name, value_name, is_pd_like, native_namespace)\u001b[39m\n\u001b[32m   1336\u001b[39m         \u001b[38;5;28;01mif\u001b[39;00m argument == \u001b[33m\"\u001b[39m\u001b[33mindex\u001b[39m\u001b[33m\"\u001b[39m:\n\u001b[32m   1337\u001b[39m             err_msg += \u001b[33m\"\u001b[39m\u001b[38;5;130;01m\\n\u001b[39;00m\u001b[33m To use the index, pass it in directly as `df.index`.\u001b[39m\u001b[33m\"\u001b[39m\n\u001b[32m-> \u001b[39m\u001b[32m1338\u001b[39m         \u001b[38;5;28;01mraise\u001b[39;00m \u001b[38;5;167;01mValueError\u001b[39;00m(err_msg)\n\u001b[32m   1339\u001b[39m \u001b[38;5;28;01melif\u001b[39;00m length \u001b[38;5;129;01mand\u001b[39;00m (actual_len := \u001b[38;5;28mlen\u001b[39m(df_input)) != length:\n\u001b[32m   1340\u001b[39m     \u001b[38;5;28;01mraise\u001b[39;00m \u001b[38;5;167;01mValueError\u001b[39;00m(\n\u001b[32m   1341\u001b[39m         \u001b[33m\"\u001b[39m\u001b[33mAll arguments should have the same length. \u001b[39m\u001b[33m\"\u001b[39m\n\u001b[32m   1342\u001b[39m         \u001b[33m\"\u001b[39m\u001b[33mThe length of column argument `df[\u001b[39m\u001b[38;5;132;01m%s\u001b[39;00m\u001b[33m]` is \u001b[39m\u001b[38;5;132;01m%d\u001b[39;00m\u001b[33m, whereas the \u001b[39m\u001b[33m\"\u001b[39m\n\u001b[32m   (...)\u001b[39m\u001b[32m   1349\u001b[39m         )\n\u001b[32m   1350\u001b[39m     )\n",
-      "\u001b[31mValueError\u001b[39m: Value of 'x' is not the name of a column in 'data_frame'. Expected one of [('Close', 'AAPL'), ('High', 'AAPL'), ('Low', 'AAPL'), ('Open', 'AAPL'), ('Volume', 'AAPL'), ('MA20', ''), ('MA50', ''), ('Signal', ''), ('Position', ''), ('Returns', '')] but received: Returns"
-     ]
-    }
-   ],
-   "source": [
-    "import streamlit as st\n",
-    "import yfinance as yf\n",
-    "import pandas as pd\n",
-    "import plotly.graph_objects as go\n",
-    "import plotly.express as px\n",
-    "from sklearn.ensemble import RandomForestClassifier\n",
-    "from datetime import datetime, timedelta\n",
-    "\n",
-    "# --- 1. SETUP & DATA FETCHING ---\n",
-    "st.set_page_config(page_title=\"All-in-One Stock App\", layout=\"wide\")\n",
-    "st.title(\"📈 Pro Stock Analyzer & ML Predictor\")\n",
-    "\n",
-    "ticker = st.sidebar.text_input(\"Enter Ticker Symbol\", \"AAPL\").upper()\n",
-    "days_back = st.sidebar.slider(\"Days of Data\", 365, 1000, 500)\n",
-    "\n",
-    "@st.cache_data\n",
-    "def load_data(symbol, days):\n",
-    "    end = datetime.now()\n",
-    "    start = end - timedelta(days=days)\n",
-    "    df = yf.download(symbol, start=start, end=end)\n",
-    "    return df\n",
-    "\n",
-    "data = load_data(ticker, days_back)\n",
-    "\n",
-    "if not data.empty:\n",
-    "    # --- 2. TECHNICAL INDICATORS & SIGNALS ---\n",
-    "    data['MA20'] = data['Close'].rolling(20).mean()\n",
-    "    data['MA50'] = data['Close'].rolling(50).mean()\n",
-    "    \n",
-    "    data['Signal'] = 0.0\n",
-    "    data['Signal'] = (data['MA20'] > data['MA50']).astype(float)\n",
-    "    data['Position'] = data['Signal'].diff()\n",
-    "\n",
-    "    # --- 3. MAIN DASHBOARD ---\n",
-    "    col1, col2 = st.columns(2)\n",
-    "\n",
-    "    with col1:\n",
-    "        st.subheader(\"Price & Crossover Signals\")\n",
-    "        fig = go.Figure()\n",
-    "        fig.add_trace(go.Scatter(x=data.index, y=data['Close'].squeeze(), name=\"Close\", line=dict(color='gray', width=1)))\n",
-    "        fig.add_trace(go.Scatter(x=data.index, y=data['MA20'].squeeze(), name=\"20-Day MA\", line=dict(color='blue')))\n",
-    "        fig.add_trace(go.Scatter(x=data.index, y=data['MA50'].squeeze(), name=\"50-Day MA\", line=dict(color='orange')))\n",
-    "        \n",
-    "        # Plot Buy/Sell signals\n",
-    "        fig.add_trace(go.Scatter(x=data[data['Position'] == 1].index, y=data['MA20'][data['Position'] == 1], \n",
-    "                                 mode='markers', marker=dict(symbol='triangle-up', size=12, color='green'), name='Buy'))\n",
-    "        fig.add_trace(go.Scatter(x=data[data['Position'] == -1].index, y=data['MA20'][data['Position'] == -1], \n",
-    "                                 mode='markers', marker=dict(symbol='triangle-down', size=12, color='red'), name='Sell'))\n",
-    "        st.plotly_chart(fig, use_container_width=True)\n",
-    "\n",
-    "    with col2:\n",
-    "        st.subheader(\"📊 Statistics\")\n",
-    "        # Fixed Float conversion for new yfinance format\n",
-    "        latest_price = float(data['Close'].iloc[-1])\n",
-    "        st.metric(\"Latest Price\", f\"${latest_price:.2f}\")\n",
-    "\n",
-    "        avg_return = float(data['Close'].pct_change().mean() * 100)\n",
-    "        st.metric(\"Avg Daily Return\", f\"{avg_return:.2f}%\")\n",
-    "        st.write(data.tail(5))\n",
-    "\n",
-    "    # --- 4. EDA SECTION ---\n",
-    "    st.divider()\n",
-    "    st.subheader(\"🔍 Exploratory Data Analysis\")\n",
-    "    eda_col1, eda_col2 = st.columns(2)\n",
-    "    \n",
-    "    with eda_col1:\n",
-    "        data['Returns'] = data['Close'].pct_change()\n",
-    "        st.plotly_chart(px.histogram(data, x=\"Returns\", title=\"Return Distribution\"), use_container_width=True)\n",
-    "    \n",
-    "    with eda_col2:\n",
-    "        st.plotly_chart(px.box(data, y=\"Returns\", title=\"Volatility Outliers\"), use_container_width=True)\n",
-    "\n",
-    "    # --- 5. ML PREDICTION ---\n",
-    "    st.divider()\n",
-    "    st.subheader(\"🤖 AI Price Direction Prediction\")\n",
-    "    \n",
-    "    ml_df = data.copy().dropna()\n",
-    "    ml_df['Target'] = (ml_df['Close'].shift(-1) > ml_df['Close']).astype(int)\n",
-    "    features = ml_df[['MA20', 'MA50', 'Returns']].iloc[:-1]\n",
-    "    target = ml_df['Target'].iloc[:-1]\n",
-    "    \n",
-    "    model = RandomForestClassifier(n_estimators=100, random_state=42)\n",
-    "    model.fit(features.values, target.values) # Using .values to avoid warning\n",
-    "    \n",
-    "    last_features = ml_df[['MA20', 'MA50', 'Returns']].tail(1).values\n",
-    "    pred = model.predict(last_features)[0]\n",
-    "    \n",
-    "    if pred == 1:\n",
-    "        st.success(\"Model Predicts: **UP** (Bullish Movement)\")\n",
-    "    else:\n",
-    "        st.error(\"Model Predicts: **DOWN** (Bearish Movement)\")\n",
-    "else:\n",
-    "    st.warning(\"Please enter a valid stock ticker symbol.\")\n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "5e9f3540-697c-4a9e-89ec-47004597d579",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "829d316b-8468-441c-a961-1e87c05ab73b",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "374a32b1-4f64-4b50-9479-a4b9ebd000d5",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "03bc08c8-6b31-4640-87a3-0b799567dd31",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "0c80c15a-c521-4d27-b1d1-f0c56703a5dd",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "4dc7511e-d17a-4b1f-9df6-42a2ef7c131e",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "f5d9f9df-84d0-4cc6-bf2b-5f890cbb36cb",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "146c9b5b-9289-47a1-9842-023a2b57d61a",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "10a4bfbc-8685-4adc-bf77-d6e41ad8178b",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "7558ac18-47a2-474f-8072-3642a0375629",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "2056937a-1b2a-4d6e-809f-67bc3b057956",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "63483ef7-130f-4c23-a0a6-39a93af1145b",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "701888e2-bd73-420f-a1cc-bff12d95882d",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "bda3a016-f3e0-4eea-ace3-46d360dbaa66",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "e37c61f9-6c25-40e2-94bd-36bae99ffe9a",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "98f25b90-1a73-44e1-95ef-254eac0df722",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "Python [conda env:base] *",
-   "language": "python",
-   "name": "conda-base-py"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.13.9"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 5
-}
+import streamlit as st
+import yfinance as yf
+import pandas as pd
+import plotly.graph_objects as go
+import plotly.express as px
+from sklearn.ensemble import RandomForestClassifier
+from datetime import datetime, timedelta
+
+# --- 1. SETUP ---
+st.set_page_config(page_title="Stox Analyzer", layout="wide")
+st.title("📈 Pro Stock Analyzer & ML Predictor")
+
+ticker = st.sidebar.text_input("Enter Ticker Symbol", "AAPL").upper()
+days_back = st.sidebar.slider("Days of Data", 365, 1000, 500)
+
+@st.cache_data
+def load_data(symbol, days):
+    end = datetime.now()
+    start = end - timedelta(days=days)
+    df = yf.download(symbol, start=start, end=end)
+    # Fix for multi-index columns in newer yfinance
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = df.columns.get_level_values(0)
+    return df
+
+data = load_data(ticker, days_back)
+
+if not data.empty:
+    # --- 2. INDICATORS ---
+    data['MA20'] = data['Close'].rolling(20).mean()
+    data['MA50'] = data['Close'].rolling(50).mean()
+    data['Returns'] = data['Close'].pct_change()
+    
+    data['Signal'] = (data['MA20'] > data['MA50']).astype(float)
+    data['Position'] = data['Signal'].diff()
+
+    # --- 3. DASHBOARD ---
+    col1, col2 = st.columns(2)
+    with col1:
+        st.subheader("Price & Signals")
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=data.index, y=data['Close'], name="Close"))
+        fig.add_trace(go.Scatter(x=data.index, y=data['MA20'], name="20-Day MA"))
+        
+        # Plot Buy/Sell signals
+        buy_signals = data[data['Position'] == 1]
+        sell_signals = data[data['Position'] == -1]
+        
+        fig.add_trace(go.Scatter(x=buy_signals.index, y=buy_signals['MA20'], 
+                                 mode='markers', marker=dict(symbol='triangle-up', size=12, color='green'), name='Buy'))
+        fig.add_trace(go.Scatter(x=sell_signals.index, y=sell_signals['MA20'], 
+                                 mode='markers', marker=dict(symbol='triangle-down', size=12, color='red'), name='Sell'))
+        st.plotly_chart(fig, width='stretch')
+
+    with col2:
+        st.subheader("📊 Stats")
+        # Fixed: Using .item() ensures we get a single number
+        latest_price = float(data['Close'].iloc[-1])
+        st.metric("Latest Price", f"${latest_price:.2f}")
+        
+        avg_ret = float(data['Returns'].mean() * 100)
+        st.metric("Avg Daily Return", f"{avg_ret:.2f}%")
+        st.dataframe(data.tail(5))
+
+    # --- 4. EDA ---
+    st.divider()
+    st.subheader("🔍 Exploratory Data Analysis")
+    e1, e2 = st.columns(2)
+    with e1:
+        fig_hist = px.histogram(x=data['Returns'].dropna(), title="Return Distribution")
+        st.plotly_chart(fig_hist, width='stretch')
+    with e2:
+        fig_box = px.box(y=data['Returns'].dropna(), title="Volatility Range")
+        st.plotly_chart(fig_box, width='stretch')
+
+    # --- 5. ML PREDICTION ---
+    st.divider()
+    st.subheader("🤖 AI Price Direction Prediction")
+    ml_df = data.dropna()
+    ml_df['Target'] = (ml_df['Close'].shift(-1) > ml_df['Close']).astype(int)
+    
+    X = ml_df[['MA20', 'MA50', 'Returns']].iloc[:-1].values
+    y = ml_df['Target'].iloc[:-1].values
+    model = RandomForestClassifier(n_estimators=100, random_state=42).fit(X, y)
+    
+    pred = model.predict(ml_df[['MA20', 'MA50', 'Returns']].tail(1).values)
+    if pred == 1:
+        st.success("Model Predicts: **UP** tomorrow (Bullish)")
+    else:
+        st.error("Model Predicts: **DOWN** tomorrow (Bearish)")
+else:
+    st.error("Ticker not found. Please try another symbol like TSLA or MSFT.")
