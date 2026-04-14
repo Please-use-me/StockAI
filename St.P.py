@@ -53,7 +53,8 @@ if not data.empty:
         latest_price = float(data['Close'].iloc[-1].item())
         st.metric("Latest Price", f"${latest_price:.2f}")
 
-        avg_return = float(data['Close'].pct_change().mean() * 100)
+        avg_return = float((data['Close'].pct_change().mean() * 100).item())
+
         avg_return = float(data['Returns'].mean().item() * 100)
 
         st.write(data.tail(5))
