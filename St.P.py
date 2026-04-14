@@ -63,44 +63,41 @@ if not data.empty:
 
         st.write(data.tail(5))
 
-          # --- 4. EDA SECTION (Disabled due to Data Shape Error) ---
-    # st.divider()
-    # st.subheader("🔍 Exploratory Data Analysis")
-    # eda_col1, eda_col2 = st.columns(2)
+             # --- 4. EDA SECTION (Simplified to fix errors) ---
+    st.divider()
+    st.subheader("🔍 Market Overview")
     
-    # data_returns = data['Close'].pct_change().dropna()
-
-    # with eda_col1:
-    #     fig_hist = px.histogram(x=data_returns, title="Return Distribution")
-    #     st.plotly_chart(fig_hist, width='stretch')
-    
-    # with eda_col2:
-    #     fig_box = px.box(y=data_returns, title="Volatility Range")
-    #     st.plotly_chart(fig_box, width='stretch')
-
-
-
-
-
+    # We display a simple table instead of the broken charts
+    st.write("Recent Daily Returns (%)")
+    display_returns = (data['Close'].pct_change() * 100).dropna().tail(10)
+    st.dataframe(display_returns)
 
     # --- 5. ML PREDICTION ---
     st.divider()
     st.subheader("🤖 AI Price Direction Prediction")
     
+    # Clean data for ML
     ml_df = data.copy().dropna()
+    # Ensure we have 1D arrays for the target
     ml_df['Target'] = (ml_df['Close'].shift(-1) > ml_df['Close']).astype(int)
-    features = ml_df[['MA20', 'MA50', 'Returns']].iloc[:-1]
-    target = ml_df['Target'].iloc[:-1]
     
-    model = RandomForestClassifier(n_estimators=100, random_state=42)
-    model.fit(features.values, target.values) # Using .values to avoid warning
+    # Force features to be a clean 2D array and target to be 1D
+    X = ml_df[['MA20', 'MA50']].iloc[:-1].values
+    y = ml_df['Target'].iloc[:-1].values.ravel()
     
-    last_features = ml_df[['MA20', 'MA50', 'Returns']].tail(1).values
-    pred = model.predict(last_features)[0]
-    
-    if pred == 1:
-        st.success("Model Predicts: **UP** (Bullish Movement)")
+    if len(X) > 0:
+        model = RandomForestClassifier(n_estimators=100, random_state=42)
+        model.fit(X, y)
+        
+        # Predict for the next day
+        last_features = ml_df[['MA20', 'MA50']].tail(1).values
+        pred = model.predict(last_features)[0]
+        
+        if pred == 1:
+            st.success("Model Predicts: **UP** (Bullish Movement)")
+        else:
+            st.error("Model Predicts: **DOWN** (Bearish Movement)")
     else:
-        st.error("Model Predicts: **DOWN** (Bearish Movement)")
+        st.info("Not enough data for AI prediction yet.")
 else:
     st.warning("Please enter a valid stock ticker symbol.")
